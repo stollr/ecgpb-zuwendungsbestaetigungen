@@ -1,0 +1,23 @@
+@page {
+    size: auto; /* auto is the initial value */
+
+    /* this affects the margin in the printer settings */
+    margin: 20mm 20mm 10mm 22mm;
+}
+
+.donation-receipt {
+    page-break-after: always;
+}
+
+.first-page {
+    page-break-after: always;
+}
+
+.top-right {
+    width: 70mm;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+}

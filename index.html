@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <title>ECGPB Zuwendungsbestätigungen</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="naitsirch">
+        <meta name="keywords" content="ecgpb spenden bescheinigungen zuwendungsbestätigungen">
+        <meta name="description" content="HTML5 Tool, um Zuwendungsbestätigungen aus einer CSV Datei zu generieren">
+        <link href="components/bootstrap/dist/css/bootstrap.min.css" media="all" rel="stylesheet">
+        <link href="dist/css/all.css" media="all" rel="stylesheet">
+        <link href="dist/css/screen.css" media="screen" rel="stylesheet">
+        <link href="dist/css/print.css" media="print" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top hidden-print">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                  <a class="navbar-brand" href="#">ECGPB Zuwendungsbestätigungen</a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar-collapse">
+                    <div id="open-button" class="pull-left"></div>
+                    <div id="generate-donation-receipts-button" class="pull-left"></div>
+                </div>
+            </div>
+        </nav>
+
+        <div id="donation-list">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="alert alert-info">
+                            <p>Please open a file.</p>
+                            <p><strong>We guarantee</strong> that no data is sent to the server. Everything is kept locally on your device.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- javascript -->
+        <script type="text/javascript" src="components/react/react.min.js"></script>
+        <script type="text/javascript" src="components/react/react-dom.min.js"></script>
+        <script type="text/javascript" src="components/CSV-JS/csv.js"></script>
+        <script type="text/javascript" src="components/numbers2words/build/numbers2words.min.js"></script>
+        <script type="text/javascript" src="dist/js/app.js"></script>
+    </body>
+</html>
