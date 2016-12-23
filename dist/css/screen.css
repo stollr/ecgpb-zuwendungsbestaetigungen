@@ -12,3 +12,12 @@ body {
     padding: 20mm 20mm 10mm 22mm;
     margin: 0 auto;
 }
+
+.first-page {
+    height: 297mm;
+}
+
+.footer {
+    position: absolute;
+    top: 270mm;
+}

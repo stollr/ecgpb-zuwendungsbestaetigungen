@@ -13,11 +13,15 @@
     page-break-after: always;
 }
 
+.attachment-page-placeholder {
+    page-break-after: always;
+}
+
 .top-right {
     width: 70mm;
 }
 
 .footer {
-    position: fixed;
-    bottom: 0;
+    position: absolute;
+    top: 250mm;
 }

@@ -44,7 +44,7 @@ var OpenButton = React.createClass({
                     }}
                 />
                 <button type="button" className="btn btn-default navbar-btn" onClick={this.open}>
-                    <span className="glyphicon glyphicon-folder-open"></span>&nbsp; Open
+                    <span className="glyphicon glyphicon-folder-open"></span>&nbsp; Öffnen
                 </button>
             </div>
         );
@@ -77,7 +77,7 @@ var GenerateDonationReceiptsButton = React.createClass({
                 onClick={this.onClick}
             >
                 <span className="glyphicon glyphicon-share"></span>
-                &nbsp; Generate Donation Receipts
+                &nbsp; Zuwendungsbestätigungen generieren
             </button>
         );
     }
@@ -136,6 +136,36 @@ var DonationReceipt = React.createClass({
         donationRows: React.PropTypes.instanceOf(Array).isRequired
     },
 
+    calculateTotal: function() {
+        var total = 0.0;
+        for (var i = 0; i < this.props.donationRows.length; i++) {
+            total += parseFloat(this.props.donationRows[i][3].toString().replace(',', '.'));
+        }
+        return total;
+    },
+
+    guessNumberOfAttachmentPages: function() {
+        var numberOfPages = 1;
+
+        // about 31 rows fit on the first page
+        var numberOfRows = this.props.donationRows.length - 31;
+
+        if (numberOfRows > 0) {
+            // about 33 rows fit on the other pages
+            numberOfPages += Math.ceil(numberOfRows / 33)
+        }
+
+        return numberOfPages;
+    },
+
+    generateAttachmentPagePlaceholder: function() {
+        var placeholderElements = [];
+        for (var i = this.guessNumberOfAttachmentPages(); i > 0; i--) {
+            placeholderElements.push(<div className="attachment-page-placeholder">&nbsp;</div>);
+        }
+        return placeholderElements;
+    },
+
     render: function() {
         var firstRow     = this.props.donationRows[0];
         var currentDate  = (new Date()).toLocaleDateString();
@@ -147,11 +177,7 @@ var DonationReceipt = React.createClass({
         var zip          = firstRow[26];
         var city         = firstRow[27];
         var country      = firstRow[25];
-        var total        = 0.0;
-
-        for (var i = 0; i < this.props.donationRows.length; i++) {
-            total += parseFloat(this.props.donationRows[i][3].toString().replace(',', '.'));
-        }
+        var total        = this.calculateTotal();
 
         var translator = new T2W("DE_DE");
         var totalInWords = translator.toWords(Math.round(total));
@@ -165,12 +191,15 @@ var DonationReceipt = React.createClass({
         return (
             <div className="donation-receipt">
                 <div className="first-page">
-                    <div class="text-nano">&nbsp;</div>
-                    {/*<img className="logo" src="dist/img/logo.png" />*/}
+                    <div className="text-right">
+                        <img className="logo" src="dist/img/logo.png" />
+                    </div>
+                    {/* this is needed in print view to get the correct margin of address */}
+                    <div className="address-margin">&nbsp;</div>
                     <div className="address">
-                        {/*<div className="sender">
+                        <div className="sender">
                             <u>Evangeliums-Christengemeinde e.V. &middot; Karl-Schurz-Str. 28 &middot; 33100 Paderborn</u>
-                        </div>*/}
+                        </div>
                         {salutation}<br/>
                         {firstname} {lastname}<br/>
                         {street}<br/>
@@ -193,7 +222,7 @@ var DonationReceipt = React.createClass({
                             <tr>
                                 <th>Betrag der Zuwendung - in Ziffern -</th>
                                 <th>- in Buchstaben -</th>
-                                <th>Tag der Zuwendung</th>
+                                <th>Datum der Zuwendung</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -205,7 +234,7 @@ var DonationReceipt = React.createClass({
                         </tbody>
                     </table>
                     <p>Es handelt sich um den Verzicht auf die Erstattung von Aufwendungen Ja [ &nbsp; ] Nein [ X ]</p>
-                    <p>&nbsp;</p>
+                    <br/>
                     <p className="text-small text-justify">
                         Wir sind wegen Förderung gemeinnütziger Zwecke nach dem Freistellungsbescheid bzw. nach der Anlage zum Körperschaftsteuerbescheid des
                         Finanz&shy;amtes Paderborn, StNr. 339/5780/4167 vom 16.03.2015 für den letzten Veranlagungszeitraum 2011 bis 2013 nach § 5 Abs. 1 Nr. 9 des
@@ -237,7 +266,7 @@ var DonationReceipt = React.createClass({
                         Freistellungsbescheides länger als 5 Jahre bzw. das Datum der Feststellung der Einhaltung der satzungsmäßigen Voraussetzungen nach § 60a Abs. 1
                         AO länger als 3 Jahre seit Ausstellung des Bescheides zurückliegt (§ 63 Abs. 5 AO).
                     </p>
-                    {/*<table className="footer">
+                    <table className="footer">
                         <tr>
                             <td className="text-small">
                                 Evangeliums-Christengemeinde e.V.<br/>
@@ -255,40 +284,57 @@ var DonationReceipt = React.createClass({
                                 Sparkasse Paderborn-Detmold
                             </td>
                         </tr>
-                    </table>*/}
+                    </table>
                 </div>
                 <div className="attachment">
                     <h2>Anlage zur Sammelbestätigung</h2>
                     <p>
                         vom {currentDate} der Evangeliums-Christengemeinde e.V.
-                        für den Zuwendenden {firstname} {lastname},
-                        {street}, {zip} {city}
+                        für den Zuwendenden {firstname} {lastname}, {street}, {zip} {city}
                     </p>
-                    <table className="table table-bordered table-condensed">
+                    <table className="donations table table-bordered table-condensed">
                         <thead>
                             <tr>
-                                <th>Datum der Zuwendung</th>
+                                <th>Datum der<br/>Zuwendung</th>
                                 <th>Art der Zuwendung</th>
-                                <th>Verzicht auf Erstattung</th>
+                                <th>Verzicht auf<br/>Erstattung</th>
                                 <th>Verwendungszweck</th>
                                 <th className="text-right">Betrag</th>
                             </tr>
                         </thead>
                         <tbody>
                             {this.props.donationRows.map(function (row) {
+                                var amount = parseFloat(row[3].toString().replace(',', '.'));
                                 return (
                                     <tr>
-                                        <td>{parseDate(firstRow[8]).toLocaleString()}</td>
+                                        <td>
+                                            {
+                                                parseDate(row[8]).toLocaleDateString('de-DE', {
+                                                    year: 'numeric',
+                                                    month: '2-digit',
+                                                    day: '2-digit'
+                                                })
+                                            }
+                                        </td>
                                         <td>Geldzuwendung</td>
                                         <td>nein</td>
                                         <td>{row[6]}</td>
-                                        <td className="text-right">{row[3]} &euro;</td>
+                                        <td className="text-right">{amount.toFixed(2)} &euro;</td>
                                     </tr>
                                 );
                             })}
+                            <tr>
+                                <td colSpan="4">
+                                    <strong>Gesamtsumme</strong>
+                                </td>
+                                <td className="text-right">
+                                    <strong>{total.toFixed(2).replace('.', ',')} &euro;</strong>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+                {this.generateAttachmentPagePlaceholder()}
             </div>
         );
     }
@@ -387,16 +433,7 @@ var App = React.createClass({
         }
 
         return (
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-sm-12">
-                        <div className="alert alert-info">
-                            <p>Please open a file.</p>
-                            <p><strong>We guarantee</strong> that no data is sent to the server. Everything is kept locally on your device.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div></div>
         );
     }
 });

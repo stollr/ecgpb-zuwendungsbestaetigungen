@@ -7,7 +7,7 @@ h2 {
     font-weight: bold;
 }
 
-td, th {
+td, th, .table > thead > tr > td, .table > thead > tr > th {
     vertical-align: top;
 }
 
@@ -15,20 +15,24 @@ td, th {
     font-size: 7.5pt;
 }
 
-.text-nano {
-    font-size: 0.1pt
+.address-margin {
+    height: 0;
+}
+
+.first-page {
+    position: relative;
 }
 
 .logo {
-    width: 30mm;
+    height: 20mm;
 }
 
 .address {
     box-sizing: border-box;
     width: 90mm;
 /*    height: 45mm;*/
-    margin-top: 25mm; /* page margin is already 20mm => 45mm */
-    padding: 10mm 2mm 2mm 0;
+    margin-top: 5mm; /* page margin is already 20mm => 45mm */
+    padding: 2mm 2mm 2mm 0;
 }
 
 .address .sender {
@@ -37,12 +41,15 @@ td, th {
 }
 
 .date {
-    margin-top: 5mm;
     margin-bottom: 7.5mm;
 }
 
 .signature {
-    padding: 20mm 0 10mm 0;
+    padding: 15mm 0 5mm 0;
+}
+
+.donations {
+    font-size: 9pt;
 }
 
 .footer tr td {
