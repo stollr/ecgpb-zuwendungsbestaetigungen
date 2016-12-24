@@ -1,8 +1,13 @@
 body {
     padding-top: 70px; /* this is needed because of fixed navbar */
 }
+
 .navbar-fixed-top .navbar-collapse {
     padding-right: 15px;
+}
+
+.navbar-fixed-top .navbar-collapse div.pull-left {
+    margin-right: 5px;
 }
 
 .donation-receipt > * {
