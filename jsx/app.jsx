@@ -192,7 +192,7 @@ var DonationReceipt = React.createClass({
             <div className="donation-receipt">
                 <div className="first-page">
                     <div className="text-right">
-                        <img className="logo" src="dist/img/logo.png" />
+                        <img className="logo" src="img/logo.png" />
                     </div>
                     {/* this is needed in print view to get the correct margin of address */}
                     <div className="address-margin">&nbsp;</div>

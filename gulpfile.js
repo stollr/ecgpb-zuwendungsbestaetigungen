@@ -12,11 +12,11 @@ gulp.task("default", function() {
         babelInst.end();
     });
 
-    return gulp.src("app.jsx")
+    return gulp.src("jsx/*.jsx")
         .pipe(babelInst)
-        .pipe(gulp.dest("dist/js/"));
+        .pipe(gulp.dest("js/"));
 });
 
 gulp.task('watch', function() {
-  gulp.watch('app.jsx', ['default']);
+  gulp.watch('jsx/app.jsx', ['default']);
 });

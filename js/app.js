@@ -277,7 +277,7 @@ var DonationReceipt = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'text-right' },
-                    React.createElement('img', { className: 'logo', src: 'dist/img/logo.png' })
+                    React.createElement('img', { className: 'logo', src: 'img/logo.png' })
                 ),
                 React.createElement(
                     'div',
