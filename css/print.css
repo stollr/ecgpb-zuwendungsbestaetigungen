@@ -2,7 +2,7 @@
     size: auto; /* auto is the initial value */
 
     /* this affects the margin in the printer settings */
-    margin: 20mm 20mm 10mm 22mm;
+    margin: 20mm 20mm 10mm 20mm;
 }
 
 .donation-receipt {
@@ -23,5 +23,5 @@
 
 .footer {
     position: absolute;
-    top: 250mm;
+    top: 255mm;
 }
