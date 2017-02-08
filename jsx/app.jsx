@@ -97,14 +97,14 @@ var CsvTable = React.createClass({
             <table className="table table-condensed table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>{this.props.csvRows[0][1]}</th>{/* name */}
-                        <th>{this.props.csvRows[0][2]}</th>{/* vorname */}
-                        <th>{this.props.csvRows[0][3]}</th>{/* betrag */}
-                        <th>{this.props.csvRows[0][6]}</th>{/* bemerkung */}
-                        <th>{this.props.csvRows[0][8]}</th>{/* datum */}
-                        <th>{this.props.csvRows[0][15]}</th>{/* konto */}
-                        <th>{this.props.csvRows[0][16]}</th>{/* geldkonto */}
-                        <th>{this.props.csvRows[0][22]}</th>{/* mitgliedernr. */}
+                        <th>{this.props.csvRows[0]['NAME']}</th>{/* name */}
+                        <th>{this.props.csvRows[0]['VORNAME']}</th>{/* vorname */}
+                        <th>{this.props.csvRows[0]['BETRAG']}</th>{/* betrag */}
+                        <th>{this.props.csvRows[0]['BEMERKUNG']}</th>{/* bemerkung */}
+                        <th>{this.props.csvRows[0]['DATUM']}</th>{/* datum */}
+                        <th>{this.props.csvRows[0]['KONTO']}</th>{/* konto */}
+                        <th>{this.props.csvRows[0]['GELD']}</th>{/* geldkonto */}
+                        <th>{this.props.csvRows[0]['MITNUM']}</th>{/* mitgliedernr. */}
                     </tr>
                 </thead>
                 <tbody>{(function($this) {
@@ -112,15 +112,15 @@ var CsvTable = React.createClass({
 
                     for (var i = 1; i < $this.props.csvRows.length; i++) {
                         csvRows.push(
-                            <tr>
-                                <td>{$this.props.csvRows[i][1]}</td>{/* name */}
-                                <td>{$this.props.csvRows[i][2]}</td>{/* vorname */}
-                                <td>{$this.props.csvRows[i][3]}</td>{/* betrag */}
-                                <td>{$this.props.csvRows[i][6]}</td>{/* bemerkung */}
-                                <td>{$this.props.csvRows[i][8]}</td>{/* datum */}
-                                <td>{$this.props.csvRows[i][15]}</td>{/* konto */}
-                                <td>{$this.props.csvRows[i][16]}</td>{/* geldkonto */}
-                                <td>{$this.props.csvRows[i][22]}</td>{/* mitgliedernr. */}
+                            <tr key={i}>
+                                <td>{$this.props.csvRows[i]['NAME']}</td>{/* name */}
+                                <td>{$this.props.csvRows[i]['VORNAME']}</td>{/* vorname */}
+                                <td>{$this.props.csvRows[i]['BETRAG']}</td>{/* betrag */}
+                                <td>{$this.props.csvRows[i]['BEMERKUNG']}</td>{/* bemerkung */}
+                                <td>{$this.props.csvRows[i]['DATUM']}</td>{/* datum */}
+                                <td>{$this.props.csvRows[i]['KONTO']}</td>{/* konto */}
+                                <td>{$this.props.csvRows[i]['GELD']}</td>{/* geldkonto */}
+                                <td>{$this.props.csvRows[i]['MITNUM']}</td>{/* mitgliedernr. */}
                             </tr>
                         );
                     }
@@ -139,7 +139,7 @@ var DonationReceipt = React.createClass({
     calculateTotal: function() {
         var total = 0.0;
         for (var i = 0; i < this.props.donationRows.length; i++) {
-            total += parseFloat(this.props.donationRows[i][3].toString().replace(',', '.'));
+            total += parseFloat(this.props.donationRows[i]['BETRAG'].toString().replace(',', '.'));
         }
         return total;
     },
@@ -152,7 +152,7 @@ var DonationReceipt = React.createClass({
 
         if (numberOfRows > 0) {
             // about 33 rows fit on the other pages
-            numberOfPages += Math.ceil(numberOfRows / 33)
+            numberOfPages += Math.ceil(numberOfRows / 33);
         }
 
         return numberOfPages;
@@ -161,27 +161,32 @@ var DonationReceipt = React.createClass({
     generateAttachmentPagePlaceholder: function() {
         var placeholderElements = [];
         for (var i = this.guessNumberOfAttachmentPages(); i > 0; i--) {
-            placeholderElements.push(<div className="attachment-page-placeholder">&nbsp;</div>);
+            placeholderElements.push(<div key={i} className="attachment-page-placeholder">&nbsp;</div>);
         }
         return placeholderElements;
     },
 
     render: function() {
+        var currentDate  = (new Date()).toLocaleDateString('de-DE', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+
         var firstRow     = this.props.donationRows[0];
-        var currentDate  = (new Date()).toLocaleDateString();
-        var donationDate = parseDate(firstRow[8]);
-        var salutation   = firstRow[33];
-        var firstname    = firstRow[2];
-        var lastname     = firstRow[1];
-        var street       = firstRow[24];
-        var zip          = firstRow[26];
-        var city         = firstRow[27];
-        var country      = firstRow[25];
+        var donationDate = parseDate(firstRow['DATUM']);
+        var salutation   = firstRow['ANREDE'];
+        var firstname    = firstRow['VORNAME'];
+        var lastname     = firstRow['NAME'];
+        var street       = firstRow['STRASSE'];
+        var zip          = firstRow['PLZ'];
+        var city         = firstRow['ORT'];
+        var country      = firstRow['LAND'];
         var total        = this.calculateTotal();
 
         var translator = new T2W("DE_DE");
-        var totalInWords = translator.toWords(Math.round(total));
-        var totalDecInWords = translator.toWords((total * 100) % 100);
+        var totalInWords = translator.toWords(Math.floor(total));
+        var totalDecInWords = translator.toWords(Math.round((total * 100) % 100)); // we have to round here, otherwise we may get problems with floating point precision
 
         switch (country) {
             case 'D':
@@ -267,23 +272,25 @@ var DonationReceipt = React.createClass({
                         AO länger als 3 Jahre seit Ausstellung des Bescheides zurückliegt (§ 63 Abs. 5 AO).
                     </p>
                     <table className="footer">
-                        <tr>
-                            <td className="text-small">
-                                Evangeliums-Christengemeinde e.V.<br/>
-                                Karl-Schurz-Straße 28<br/>
-                                33100 Paderborn
-                            </td>
-                            <td className="text-small">
-                                Tel.: 05251 - 59134<br/>
-                                E-Mail: info@ecg-paderborn.de<br/>
-                                www.ecg-paderborn.de
-                            </td>
-                            <td className="text-small">
-                                IBAN: DE12 4765 0130 0028 0013 03<br/>
-                                BIC: WELADE3LXXX<br/>
-                                Sparkasse Paderborn-Detmold
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td className="text-small">
+                                    Evangeliums-Christengemeinde e.V.<br/>
+                                    Karl-Schurz-Straße 28<br/>
+                                    33100 Paderborn
+                                </td>
+                                <td className="text-small">
+                                    Tel.: 05251 - 59134<br/>
+                                    E-Mail: info@ecg-paderborn.de<br/>
+                                    www.ecg-paderborn.de
+                                </td>
+                                <td className="text-small">
+                                    IBAN: DE12 4765 0130 0028 0013 03<br/>
+                                    BIC: WELADE3LXXX<br/>
+                                    Sparkasse Paderborn-Detmold
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 <div className="attachment">
@@ -303,13 +310,13 @@ var DonationReceipt = React.createClass({
                             </tr>
                         </thead>
                         <tbody>
-                            {this.props.donationRows.map(function (row) {
-                                var amount = parseFloat(row[3].toString().replace(',', '.'));
+                            {this.props.donationRows.map(function (row, index) {
+                                var amount = parseFloat(row['BETRAG'].toString().replace(',', '.'));
                                 return (
-                                    <tr>
+                                    <tr key={index}>
                                         <td>
                                             {
-                                                parseDate(row[8]).toLocaleDateString('de-DE', {
+                                                parseDate(row['DATUM']).toLocaleDateString('de-DE', {
                                                     year: 'numeric',
                                                     month: '2-digit',
                                                     day: '2-digit'
@@ -318,7 +325,7 @@ var DonationReceipt = React.createClass({
                                         </td>
                                         <td>Geldzuwendung</td>
                                         <td>nein</td>
-                                        <td>{row[6]}</td>
+                                        <td>{row['BEMERKUNG']}</td>
                                         <td className="text-right">{amount.toFixed(2)} &euro;</td>
                                     </tr>
                                 );
@@ -334,7 +341,7 @@ var DonationReceipt = React.createClass({
                         </tbody>
                     </table>
                 </div>
-                {this.generateAttachmentPagePlaceholder()}
+                {/*this.generateAttachmentPagePlaceholder()*/}
             </div>
         );
     }
@@ -378,6 +385,17 @@ var App = React.createClass({
             var fileContent = e.target.result;
             //var csvRows = CSV.parse(convertLatin1ToUtf8(fileContent));
             var csvRows = CSV.parse(fileContent);
+            var headerRow = csvRows[0];
+
+            // convert rows to objects
+            for (var i = 0; i < csvRows.length; i++) {
+                var obj = {};
+                for (var j = 0; j < csvRows[i].length; j++) {
+                    var key = headerRow[j];
+                    obj[key] = csvRows[i][j];
+                }
+                csvRows[i] = obj;
+            }
 
             $this.state.activeStateSetterFnc(true);
             $this.setState({
@@ -394,8 +412,8 @@ var App = React.createClass({
 
         for (var i = 1; i < this.state.csvRows.length; i++) {
             var row = this.state.csvRows[i];
-            var account = row[15];
-            var donatorId = row[22];
+            var account = row['KONTO'];
+            var donatorId = row['MITNUM'];
             if (account == '3221') {
                 if (groupedByDonator[donatorId]) {
                     groupedByDonator[donatorId].push(row);
@@ -410,7 +428,7 @@ var App = React.createClass({
         for (var donatorId in groupedByDonator) {
             var donationRows = groupedByDonator[donatorId];
             donationReceipts.push(
-                <DonationReceipt donationRows={donationRows} />
+                <DonationReceipt key={donatorId} donationRows={donationRows} />
             );
         }
 

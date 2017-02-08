@@ -108,42 +108,42 @@ var CsvTable = React.createClass({
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][1]
+                        this.props.csvRows[0]['NAME']
                     ),
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][2]
+                        this.props.csvRows[0]['VORNAME']
                     ),
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][3]
+                        this.props.csvRows[0]['BETRAG']
                     ),
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][6]
+                        this.props.csvRows[0]['BEMERKUNG']
                     ),
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][8]
+                        this.props.csvRows[0]['DATUM']
                     ),
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][15]
+                        this.props.csvRows[0]['KONTO']
                     ),
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][16]
+                        this.props.csvRows[0]['GELD']
                     ),
                     React.createElement(
                         'th',
                         null,
-                        this.props.csvRows[0][22]
+                        this.props.csvRows[0]['MITNUM']
                     )
                 )
             ),
@@ -156,46 +156,46 @@ var CsvTable = React.createClass({
                     for (var i = 1; i < $this.props.csvRows.length; i++) {
                         csvRows.push(React.createElement(
                             'tr',
-                            null,
+                            { key: i },
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][1]
+                                $this.props.csvRows[i]['NAME']
                             ),
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][2]
+                                $this.props.csvRows[i]['VORNAME']
                             ),
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][3]
+                                $this.props.csvRows[i]['BETRAG']
                             ),
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][6]
+                                $this.props.csvRows[i]['BEMERKUNG']
                             ),
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][8]
+                                $this.props.csvRows[i]['DATUM']
                             ),
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][15]
+                                $this.props.csvRows[i]['KONTO']
                             ),
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][16]
+                                $this.props.csvRows[i]['GELD']
                             ),
                             React.createElement(
                                 'td',
                                 null,
-                                $this.props.csvRows[i][22]
+                                $this.props.csvRows[i]['MITNUM']
                             )
                         ));
                     }
@@ -214,7 +214,7 @@ var DonationReceipt = React.createClass({
     calculateTotal: function () {
         var total = 0.0;
         for (var i = 0; i < this.props.donationRows.length; i++) {
-            total += parseFloat(this.props.donationRows[i][3].toString().replace(',', '.'));
+            total += parseFloat(this.props.donationRows[i]['BETRAG'].toString().replace(',', '.'));
         }
         return total;
     },
@@ -238,7 +238,7 @@ var DonationReceipt = React.createClass({
         for (var i = this.guessNumberOfAttachmentPages(); i > 0; i--) {
             placeholderElements.push(React.createElement(
                 'div',
-                { className: 'attachment-page-placeholder' },
+                { key: i, className: 'attachment-page-placeholder' },
                 '\xA0'
             ));
         }
@@ -246,21 +246,26 @@ var DonationReceipt = React.createClass({
     },
 
     render: function () {
+        var currentDate = new Date().toLocaleDateString('de-DE', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+
         var firstRow = this.props.donationRows[0];
-        var currentDate = new Date().toLocaleDateString();
-        var donationDate = parseDate(firstRow[8]);
-        var salutation = firstRow[33];
-        var firstname = firstRow[2];
-        var lastname = firstRow[1];
-        var street = firstRow[24];
-        var zip = firstRow[26];
-        var city = firstRow[27];
-        var country = firstRow[25];
+        var donationDate = parseDate(firstRow['DATUM']);
+        var salutation = firstRow['ANREDE'];
+        var firstname = firstRow['VORNAME'];
+        var lastname = firstRow['NAME'];
+        var street = firstRow['STRASSE'];
+        var zip = firstRow['PLZ'];
+        var city = firstRow['ORT'];
+        var country = firstRow['LAND'];
         var total = this.calculateTotal();
 
         var translator = new T2W("DE_DE");
-        var totalInWords = translator.toWords(Math.round(total));
-        var totalDecInWords = translator.toWords(total * 100 % 100);
+        var totalInWords = translator.toWords(Math.floor(total));
+        var totalDecInWords = translator.toWords(Math.round(total * 100 % 100)); // we have to round here, otherwise we may get problems with floating point precision
 
         switch (country) {
             case 'D':
@@ -433,34 +438,38 @@ var DonationReceipt = React.createClass({
                     'table',
                     { className: 'footer' },
                     React.createElement(
-                        'tr',
+                        'tbody',
                         null,
                         React.createElement(
-                            'td',
-                            { className: 'text-small' },
-                            'Evangeliums-Christengemeinde e.V.',
-                            React.createElement('br', null),
-                            'Karl-Schurz-Stra\xDFe 28',
-                            React.createElement('br', null),
-                            '33100 Paderborn'
-                        ),
-                        React.createElement(
-                            'td',
-                            { className: 'text-small' },
-                            'Tel.: 05251 - 59134',
-                            React.createElement('br', null),
-                            'E-Mail: info@ecg-paderborn.de',
-                            React.createElement('br', null),
-                            'www.ecg-paderborn.de'
-                        ),
-                        React.createElement(
-                            'td',
-                            { className: 'text-small' },
-                            'IBAN: DE12 4765 0130 0028 0013 03',
-                            React.createElement('br', null),
-                            'BIC: WELADE3LXXX',
-                            React.createElement('br', null),
-                            'Sparkasse Paderborn-Detmold'
+                            'tr',
+                            null,
+                            React.createElement(
+                                'td',
+                                { className: 'text-small' },
+                                'Evangeliums-Christengemeinde e.V.',
+                                React.createElement('br', null),
+                                'Karl-Schurz-Stra\xDFe 28',
+                                React.createElement('br', null),
+                                '33100 Paderborn'
+                            ),
+                            React.createElement(
+                                'td',
+                                { className: 'text-small' },
+                                'Tel.: 05251 - 59134',
+                                React.createElement('br', null),
+                                'E-Mail: info@ecg-paderborn.de',
+                                React.createElement('br', null),
+                                'www.ecg-paderborn.de'
+                            ),
+                            React.createElement(
+                                'td',
+                                { className: 'text-small' },
+                                'IBAN: DE12 4765 0130 0028 0013 03',
+                                React.createElement('br', null),
+                                'BIC: WELADE3LXXX',
+                                React.createElement('br', null),
+                                'Sparkasse Paderborn-Detmold'
+                            )
                         )
                     )
                 )
@@ -532,15 +541,15 @@ var DonationReceipt = React.createClass({
                     React.createElement(
                         'tbody',
                         null,
-                        this.props.donationRows.map(function (row) {
-                            var amount = parseFloat(row[3].toString().replace(',', '.'));
+                        this.props.donationRows.map(function (row, index) {
+                            var amount = parseFloat(row['BETRAG'].toString().replace(',', '.'));
                             return React.createElement(
                                 'tr',
-                                null,
+                                { key: index },
                                 React.createElement(
                                     'td',
                                     null,
-                                    parseDate(row[8]).toLocaleDateString('de-DE', {
+                                    parseDate(row['DATUM']).toLocaleDateString('de-DE', {
                                         year: 'numeric',
                                         month: '2-digit',
                                         day: '2-digit'
@@ -559,7 +568,7 @@ var DonationReceipt = React.createClass({
                                 React.createElement(
                                     'td',
                                     null,
-                                    row[6]
+                                    row['BEMERKUNG']
                                 ),
                                 React.createElement(
                                     'td',
@@ -594,8 +603,7 @@ var DonationReceipt = React.createClass({
                         )
                     )
                 )
-            ),
-            this.generateAttachmentPagePlaceholder()
+            )
         );
     }
 });
@@ -638,6 +646,17 @@ var App = React.createClass({
             var fileContent = e.target.result;
             //var csvRows = CSV.parse(convertLatin1ToUtf8(fileContent));
             var csvRows = CSV.parse(fileContent);
+            var headerRow = csvRows[0];
+
+            // convert rows to objects
+            for (var i = 0; i < csvRows.length; i++) {
+                var obj = {};
+                for (var j = 0; j < csvRows[i].length; j++) {
+                    var key = headerRow[j];
+                    obj[key] = csvRows[i][j];
+                }
+                csvRows[i] = obj;
+            }
 
             $this.state.activeStateSetterFnc(true);
             $this.setState({
@@ -654,8 +673,8 @@ var App = React.createClass({
 
         for (var i = 1; i < this.state.csvRows.length; i++) {
             var row = this.state.csvRows[i];
-            var account = row[15];
-            var donatorId = row[22];
+            var account = row['KONTO'];
+            var donatorId = row['MITNUM'];
             if (account == '3221') {
                 if (groupedByDonator[donatorId]) {
                     groupedByDonator[donatorId].push(row);
@@ -669,7 +688,7 @@ var App = React.createClass({
 
         for (var donatorId in groupedByDonator) {
             var donationRows = groupedByDonator[donatorId];
-            donationReceipts.push(React.createElement(DonationReceipt, { donationRows: donationRows }));
+            donationReceipts.push(React.createElement(DonationReceipt, { key: donatorId, donationRows: donationRows }));
         }
 
         this.setState({ donationReceipts: donationReceipts });
