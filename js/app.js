@@ -3,6 +3,13 @@ function parseDate(dateString) {
     return new Date(splitted[2] + '-' + splitted[1] + '-' + splitted[0]);
 }
 
+function parseLocaleNumber(stringNumber) {
+    var thousandSeparator = 1111 .toLocaleString().replace(/1/g, '');
+    var decimalSeparator = 1.1.toLocaleString().replace(/1/g, '');
+
+    return parseFloat(stringNumber.replace(new RegExp('\\' + thousandSeparator, 'g'), '').replace(new RegExp('\\' + decimalSeparator), '.'));
+}
+
 var OpenButton = React.createClass({
     getInitialState: function () {
         return {
@@ -214,7 +221,7 @@ var DonationReceipt = React.createClass({
     calculateTotal: function () {
         var total = 0.0;
         for (var i = 0; i < this.props.donationRows.length; i++) {
-            total += parseFloat(this.props.donationRows[i]['BETRAG'].toString().replace(',', '.'));
+            total += parseLocaleNumber(this.props.donationRows[i]['BETRAG'].toString());
         }
         return total;
     },
@@ -542,7 +549,7 @@ var DonationReceipt = React.createClass({
                         'tbody',
                         null,
                         this.props.donationRows.map(function (row, index) {
-                            var amount = parseFloat(row['BETRAG'].toString().replace(',', '.'));
+                            var amount = parseLocaleNumber(row['BETRAG']);
                             return React.createElement(
                                 'tr',
                                 { key: index },
@@ -573,7 +580,7 @@ var DonationReceipt = React.createClass({
                                 React.createElement(
                                     'td',
                                     { className: 'text-right' },
-                                    amount.toFixed(2),
+                                    amount.toFixed(2).replace('.', ','),
                                     ' \u20AC'
                                 )
                             );
