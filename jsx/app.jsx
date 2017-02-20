@@ -321,7 +321,7 @@ var DonationReceipt = React.createClass({
                         </thead>
                         <tbody>
                             {this.props.donationRows.map(function (row, index) {
-                                var amount = parseLocaleNumber(row['BETRAG']);
+                                var amount = parseLocaleNumber(row['BETRAG'].toString());
                                 return (
                                     <tr key={index}>
                                         <td>
