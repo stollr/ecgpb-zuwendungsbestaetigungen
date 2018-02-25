@@ -251,35 +251,43 @@ var DonationReceipt = React.createClass({
                     <p>Es handelt sich um den Verzicht auf die Erstattung von Aufwendungen Ja [ &nbsp; ] Nein [ X ]</p>
                     <br/>
                     <p className="text-small text-justify">
-                        Wir sind wegen Förderung gemeinnütziger Zwecke nach dem Freistellungsbescheid bzw. nach der Anlage zum Körperschaftsteuerbescheid des
-                        Finanz&shy;amtes Paderborn, StNr. 339/5780/4167 vom 16.03.2015 für den letzten Veranlagungszeitraum 2011 bis 2013 nach § 5 Abs. 1 Nr. 9 des
-                        Körperschaft&shy;steuergesetzes von der Körperschaftsteuer und nach § 3 Nr. 6 des Gewerbesteuergesetzes von der Gewerbesteuer befreit.
+                        Wir sind wegen Förderung gemeinnütziger Zwecke nach dem Freistellungsbescheid bzw.
+                        nach der Anlage zum Körperschaftsteuerbescheid des Finanz&shy;amtes Paderborn,
+                        StNr. 339/5780/4167 vom 27.06.2017 für den letzten Veranlagungszeitraum 2014 bis 2016
+                        nach § 5 Abs. 1 Nr. 9 des Körperschaft&shy;steuergesetzes von der Körperschaftsteuer
+                        und nach § 3 Nr. 6 des Gewerbesteuergesetzes von der Gewerbesteuer befreit.
                     </p>
                     <p className="text-small text-justify">
-                        Die Einhaltung der satzungsmäßigen Voraussetzungen nach den §§ 51, 59, 60 und 61 AO wurde vom Finanzamt Paderborn, StNr. 339/5780/4167 mit
-                        Bescheid vom 16.03.2015 nach § 60a AO gesondert festgestellt. Wir fördern nach unserer Satzung gemeinnützige Zwecke.
+                        Die Einhaltung der satzungsmäßigen Voraussetzungen nach den §§ 51, 59, 60 und 61 AO
+                        wurde vom Finanzamt Paderborn, StNr. 339/5780/4167 mit Bescheid vom 27.06.2017 nach
+                        § 60a AO gesondert festgestellt. Wir fördern nach unserer Satzung gemeinnützige Zwecke.
                     </p>
                     <p className="text-small text-justify">
-                        Es wird bestätigt, dass die Zuwendungen nur zur Förderung gemeinnütziger Zwecke verwendet werden. Es wird bestätigt, dass es sich nicht um
-                        Mit&shy;gliedsbeiträge handelt, dessen Abzug nach § 10b Abs. 1 des Einkommensteuergesetzes ausgeschlossen ist.
+                        Es wird bestätigt, dass die Zuwendungen nur zur Förderung gemeinnütziger Zwecke
+                        verwendet werden. Es wird bestätigt, dass es sich nicht um Mit&shy;gliedsbeiträge
+                        handelt, dessen Abzug nach § 10b Abs. 1 des Einkommensteuergesetzes ausgeschlossen ist.
                     </p>
                     <p className="text-small text-justify">
-                        Es wird bestätigt, dass über die in der Gesamtsumme enthaltenen Zuwendungen keine weiteren Bestätigungen, weder formelle
-                        Zuwendungsbestäti&shy;gungen noch Beitragsquittungen oder ähnliches, ausgestellt wurden und werden.
+                        Es wird bestätigt, dass über die in der Gesamtsumme enthaltenen Zuwendungen keine
+                        weiteren Bestätigungen, weder formelle Zu&shy;wen&shy;dungsbestäti&shy;gungen noch
+                        Beitragsquittungen oder ähnliches, ausgestellt wurden und werden.
                     </p>
                     <p className="signature">
                         Christian Stoller, Buchhaltung
                     </p>
                     <p className="text-small text-justify">
                         <b>Hinweis:</b><br/>
-                        Wer vorsätzlich oder grob fahrlässig eine unrichtige Zuwendungsbestätigung erstellt oder veranlasst, dass Zuwendungen nicht zu den in der
-                        Zuwendungsbestätigung angegebenen steuerbegünstigten Zwecken verwendet werden, haftet für die entgangene Steuer (§ 10b Abs. 4 EStG, § 9 Abs.
-                        3 KStG, § 9 Nr. 5 GewStG).
+                        Wer vorsätzlich oder grob fahrlässig eine unrichtige Zuwendungsbestätigung erstellt
+                        oder veranlasst, dass Zuwendungen nicht zu den in der Zuwendungsbestätigung angegebenen
+                        steuerbegünstigten Zwecken verwendet werden, haftet für die entgangene Steuer
+                        (§ 10b Abs. 4 EStG, § 9 Abs. 3 KStG, § 9 Nr. 5 GewStG).
                     </p>
                     <p className="text-small text-justify">
-                        Diese Bestätigung wird nicht als Nachweis für die steuerliche Berücksichtigung der Zuwendung anerkannt, wenn das Datum des
-                        Freistellungsbescheides länger als 5 Jahre bzw. das Datum der Feststellung der Einhaltung der satzungsmäßigen Voraussetzungen nach § 60a Abs. 1
-                        AO länger als 3 Jahre seit Ausstellung des Bescheides zurückliegt (§ 63 Abs. 5 AO).
+                        Diese Bestätigung wird nicht als Nachweis für die steuerliche Berücksichtigung der
+                        Zuwendung anerkannt, wenn das Datum des Freistellungsbescheides länger als 5 Jahre
+                        bzw. das Datum der Feststellung der Einhaltung der satzungsmäßigen Voraussetzungen
+                        nach § 60a Abs. 1 AO länger als 3 Jahre seit Ausstellung des Bescheides zurückliegt
+                        (§ 63 Abs. 5 AO).
                     </p>
                     <table className="footer">
                         <tbody>
@@ -422,9 +430,9 @@ var App = React.createClass({
 
         for (var i = 1; i < this.state.csvRows.length; i++) {
             var row = this.state.csvRows[i];
-            var account = row['KONTO'];
+            var account = parseInt(row['KONTO']);
             var donatorId = row['MITNUM'];
-            if (account == '3221') {
+            if (3221 === account || 3222 === account) {
                 if (groupedByDonator[donatorId]) {
                     groupedByDonator[donatorId].push(row);
                 } else {
@@ -433,14 +441,28 @@ var App = React.createClass({
             }
         }
 
+        // Konvert the object with the grouped donations to an array and sort it
+        // by the names of the donators.
+        var sortedByName = Object.values(groupedByDonator).sort(function (a, b) {
+            var aName = a[0]['NAME'] + ' ' + a[0]['VORNAME'];
+            var bName = b[0]['NAME'] + ' ' + b[0]['VORNAME'];
+
+            if (aName > bName) {
+                return 1;
+            } else if (aName < bName) {
+                return -1;
+            }
+            return 0;
+        });
+
         var donationReceipts = [];
 
-        for (var donatorId in groupedByDonator) {
-            var donationRows = groupedByDonator[donatorId];
+        sortedByName.forEach(function (donationRows) {
+            var donatorId = donationRows[0]['MITNUM'];
             donationReceipts.push(
                 <DonationReceipt key={donatorId} donationRows={donationRows} />
             );
-        }
+        });
 
         this.setState({donationReceipts: donationReceipts});
     },

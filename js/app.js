@@ -403,12 +403,12 @@ var DonationReceipt = React.createClass({
                 React.createElement(
                     'p',
                     { className: 'text-small text-justify' },
-                    'Wir sind wegen F\xF6rderung gemeinn\xFCtziger Zwecke nach dem Freistellungsbescheid bzw. nach der Anlage zum K\xF6rperschaftsteuerbescheid des Finanz\xADamtes Paderborn, StNr. 339/5780/4167 vom 16.03.2015 f\xFCr den letzten Veranlagungszeitraum 2011 bis 2013 nach \xA7 5 Abs. 1 Nr. 9 des K\xF6rperschaft\xADsteuergesetzes von der K\xF6rperschaftsteuer und nach \xA7 3 Nr. 6 des Gewerbesteuergesetzes von der Gewerbesteuer befreit.'
+                    'Wir sind wegen F\xF6rderung gemeinn\xFCtziger Zwecke nach dem Freistellungsbescheid bzw. nach der Anlage zum K\xF6rperschaftsteuerbescheid des Finanz\xADamtes Paderborn, StNr. 339/5780/4167 vom 27.06.2017 f\xFCr den letzten Veranlagungszeitraum 2014 bis 2016 nach \xA7 5 Abs. 1 Nr. 9 des K\xF6rperschaft\xADsteuergesetzes von der K\xF6rperschaftsteuer und nach \xA7 3 Nr. 6 des Gewerbesteuergesetzes von der Gewerbesteuer befreit.'
                 ),
                 React.createElement(
                     'p',
                     { className: 'text-small text-justify' },
-                    'Die Einhaltung der satzungsm\xE4\xDFigen Voraussetzungen nach den \xA7\xA7 51, 59, 60 und 61 AO wurde vom Finanzamt Paderborn, StNr. 339/5780/4167 mit Bescheid vom 16.03.2015 nach \xA7 60a AO gesondert festgestellt. Wir f\xF6rdern nach unserer Satzung gemeinn\xFCtzige Zwecke.'
+                    'Die Einhaltung der satzungsm\xE4\xDFigen Voraussetzungen nach den \xA7\xA7 51, 59, 60 und 61 AO wurde vom Finanzamt Paderborn, StNr. 339/5780/4167 mit Bescheid vom 27.06.2017 nach \xA7 60a AO gesondert festgestellt. Wir f\xF6rdern nach unserer Satzung gemeinn\xFCtzige Zwecke.'
                 ),
                 React.createElement(
                     'p',
@@ -418,7 +418,7 @@ var DonationReceipt = React.createClass({
                 React.createElement(
                     'p',
                     { className: 'text-small text-justify' },
-                    'Es wird best\xE4tigt, dass \xFCber die in der Gesamtsumme enthaltenen Zuwendungen keine weiteren Best\xE4tigungen, weder formelle Zuwendungsbest\xE4ti\xADgungen noch Beitragsquittungen oder \xE4hnliches, ausgestellt wurden und werden.'
+                    'Es wird best\xE4tigt, dass \xFCber die in der Gesamtsumme enthaltenen Zuwendungen keine weiteren Best\xE4tigungen, weder formelle Zu\xADwen\xADdungsbest\xE4ti\xADgungen noch Beitragsquittungen oder \xE4hnliches, ausgestellt wurden und werden.'
                 ),
                 React.createElement(
                     'p',
@@ -680,9 +680,9 @@ var App = React.createClass({
 
         for (var i = 1; i < this.state.csvRows.length; i++) {
             var row = this.state.csvRows[i];
-            var account = row['KONTO'];
+            var account = parseInt(row['KONTO']);
             var donatorId = row['MITNUM'];
-            if (account == '3221') {
+            if (3221 === account || 3222 === account) {
                 if (groupedByDonator[donatorId]) {
                     groupedByDonator[donatorId].push(row);
                 } else {
@@ -691,12 +691,26 @@ var App = React.createClass({
             }
         }
 
+        // Konvert the object with the grouped donations to an array and sort it
+        // by the names of the donators.
+        var sortedByName = Object.values(groupedByDonator).sort(function (a, b) {
+            var aName = a[0]['NAME'] + ' ' + a[0]['VORNAME'];
+            var bName = b[0]['NAME'] + ' ' + b[0]['VORNAME'];
+
+            if (aName > bName) {
+                return 1;
+            } else if (aName < bName) {
+                return -1;
+            }
+            return 0;
+        });
+
         var donationReceipts = [];
 
-        for (var donatorId in groupedByDonator) {
-            var donationRows = groupedByDonator[donatorId];
+        sortedByName.forEach(function (donationRows) {
+            var donatorId = donationRows[0]['MITNUM'];
             donationReceipts.push(React.createElement(DonationReceipt, { key: donatorId, donationRows: donationRows }));
-        }
+        });
 
         this.setState({ donationReceipts: donationReceipts });
     },
