@@ -1,160 +1,22 @@
-function parseDate(dateString) {
-    var splitted = dateString.split('.');
-    return new Date(splitted[2] + '-' + splitted[1] + '-' + splitted[0]);
-}
+import React from 'react';
+import T2W from 'numbers2words';
+import PropTypes from 'prop-types';
+import './DonationReceipt.css';
+import logoImg from '../img/logo.png';
+import signatureImg from '../img/signature.png';
+import { parseGermanDate } from './DateParser.js';
+import { parseLocaleNumber } from './NumberParser.js';
 
-function parseLocaleNumber(stringNumber) {
-    var thousandSeparator = (1111).toLocaleString().replace(/1/g, '');
-    var decimalSeparator = (1.1).toLocaleString().replace(/1/g, '');
-
-    return parseFloat(stringNumber
-        .replace(new RegExp('\\' + thousandSeparator, 'g'), '')
-        .replace(new RegExp('\\' + decimalSeparator), '.')
-    );
-}
-
-var OpenButton = React.createClass({
-    getInitialState: function() {
-      return {
-          file: null,
-          openFileInput: {
-              style: {
-                  display: 'none'
-              }
-          }
-      };
-    },
-
-    open: function() {
-        this.openFileInput.click();
-    },
-
-    fileOpened: function() {
-        if (this.openFileInput.files.length > 0) {
-            this.state.file = this.openFileInput.files[0];
-
-            if (this.props.onFileOpened) {
-                this.props.onFileOpened(this.state.file);
-            }
-        }
-    },
-
-    render: function() {
-        var $this = this;
-
-        return (
-            <div>
-                <input
-                    type="file"
-                    id="open-file"
-                    style={this.state.openFileInput.style}
-                    onChange={this.fileOpened}
-                    ref={function (element) {
-                        $this.openFileInput = element;
-                    }}
-                />
-                <button type="button" className="btn btn-default navbar-btn" onClick={this.open}>
-                    <span className="glyphicon glyphicon-folder-open"></span>&nbsp; Öffnen
-                </button>
-            </div>
-        );
-    }
-});
-
-var GenerateDonationReceiptsButton = React.createClass({
-    getInitialState: function() {
-        this.props.activeStateSetter(this.setActive);
-
-        return {
-            active: false
-        };
-    },
-
-    onClick: function() {
-        this.props.onClick && this.props.onClick();
-    },
-
-    setActive: function(status) {
-        this.setState({active: status}); 
-    },
-
-    render: function() {
-        return (
-            <button
-                type="button"
-                className="btn btn-default navbar-btn"
-                disabled={!this.state.active}
-                onClick={this.onClick}
-            >
-                <span className="glyphicon glyphicon-share"></span>
-                &nbsp; Zuwendungsbestätigungen generieren
-            </button>
-        );
-    }
-});
-
-var CsvTable = React.createClass({
-    propTypes: {
-        csvRows: React.PropTypes.instanceOf(Array).isRequired
-    },
-
-    getInitialState: function () {
-        return {};
-    },
-
-    render: function() {
-        return (
-            <table className="table table-condensed table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>{this.props.csvRows[0]['NAME']}</th>{/* name */}
-                        <th>{this.props.csvRows[0]['VORNAME']}</th>{/* vorname */}
-                        <th>{this.props.csvRows[0]['BETRAG']}</th>{/* betrag */}
-                        <th>{this.props.csvRows[0]['BEMERKUNG']}</th>{/* bemerkung */}
-                        <th>{this.props.csvRows[0]['DATUM']}</th>{/* datum */}
-                        <th>{this.props.csvRows[0]['KONTO']}</th>{/* konto */}
-                        <th>{this.props.csvRows[0]['GELD']}</th>{/* geldkonto */}
-                        <th>{this.props.csvRows[0]['MITNUM']}</th>{/* mitgliedernr. */}
-                    </tr>
-                </thead>
-                <tbody>{(function($this) {
-                    var csvRows = [];
-
-                    for (var i = 1; i < $this.props.csvRows.length; i++) {
-                        csvRows.push(
-                            <tr key={i}>
-                                <td>{$this.props.csvRows[i]['NAME']}</td>{/* name */}
-                                <td>{$this.props.csvRows[i]['VORNAME']}</td>{/* vorname */}
-                                <td>{$this.props.csvRows[i]['BETRAG']}</td>{/* betrag */}
-                                <td>{$this.props.csvRows[i]['BEMERKUNG']}</td>{/* bemerkung */}
-                                <td>{$this.props.csvRows[i]['DATUM']}</td>{/* datum */}
-                                <td>{$this.props.csvRows[i]['KONTO']}</td>{/* konto */}
-                                <td>{$this.props.csvRows[i]['GELD']}</td>{/* geldkonto */}
-                                <td>{$this.props.csvRows[i]['MITNUM']}</td>{/* mitgliedernr. */}
-                            </tr>
-                        );
-                    }
-                    return csvRows; 
-                })(this)}</tbody>
-            </table>
-        );
-    }
-});
-
-var DonationReceipt = React.createClass({
-    propTypes: {
-        donationRows: React.PropTypes.instanceOf(Array).isRequired
-    },
-
-    calculateTotal: function() {
+class DonationReceipt extends React.Component {
+    calculateTotal() {
         var total = 0.0;
         for (var i = 0; i < this.props.donationRows.length; i++) {
             total += parseLocaleNumber(this.props.donationRows[i]['BETRAG'].toString());
         }
         return total;
-    },
+    }
 
-    guessNumberOfAttachmentPages: function() {
+    guessNumberOfAttachmentPages() {
         var numberOfPages = 1;
 
         // about 31 rows fit on the first page
@@ -166,17 +28,17 @@ var DonationReceipt = React.createClass({
         }
 
         return numberOfPages;
-    },
+    }
 
-    generateAttachmentPagePlaceholder: function() {
+    generateAttachmentPagePlaceholder() {
         var placeholderElements = [];
         for (var i = this.guessNumberOfAttachmentPages(); i > 0; i--) {
             placeholderElements.push(<div key={i} className="attachment-page-placeholder">&nbsp;</div>);
         }
         return placeholderElements;
-    },
+    }
 
-    render: function() {
+    render() {
         var currentDate  = (new Date()).toLocaleDateString('de-DE', {
             year: 'numeric',
             month: '2-digit',
@@ -184,7 +46,7 @@ var DonationReceipt = React.createClass({
         });
 
         var firstRow     = this.props.donationRows[0];
-        var donationDate = parseDate(firstRow['DATUM']);
+        var donationDate = parseGermanDate(firstRow['DATUM']);
         var salutation   = firstRow['ANREDE'];
         var firstname    = firstRow['VORNAME'];
         var lastname     = firstRow['NAME'];
@@ -201,15 +63,16 @@ var DonationReceipt = React.createClass({
         switch (country) {
             case 'D':
             case 'DE': country = ''; break;
+            default: break;
         }
 
         return (
             <div className="donation-receipt">
                 <div className="first-page">
                     <div className="text-right">
-                        <img className="logo" src="img/logo.png" />
+                        <img className="logo" src={logoImg} alt="logo" />
                     </div>
-                    {/* this is needed in print view to get the correct margin of address */}
+                    <comment c="this is needed in print view to get the correct margin of address"/>
                     <div className="address-margin">&nbsp;</div>
                     <div className="address">
                         <div className="sender">
@@ -232,7 +95,7 @@ var DonationReceipt = React.createClass({
                         bezeichneten Körperschaften, Personenvereinigungen oder
                         Vermögensmassen.
                     </p>
-                    <table className="table table-bordered table-condensed">
+                    <table className="table table-bordered table-sm">
                         <thead>
                             <tr>
                                 <th>Betrag der Zuwendung - in Ziffern -</th>
@@ -273,6 +136,7 @@ var DonationReceipt = React.createClass({
                         Beitragsquittungen oder ähnliches, ausgestellt wurden und werden.
                     </p>
                     <p className="signature">
+                        <img src={signatureImg} alt="signature" />
                         Christian Stoller, Buchhaltung
                     </p>
                     <p className="text-small text-justify">
@@ -317,7 +181,7 @@ var DonationReceipt = React.createClass({
                         vom {currentDate} der Evangeliums-Christengemeinde e.V.
                         für den Zuwendenden {firstname} {lastname}, {street}, {zip} {city}
                     </p>
-                    <table className="donations table table-bordered table-condensed">
+                    <table className="donations table table-bordered table-sm">
                         <thead>
                             <tr>
                                 <th>Datum der<br/>Zuwendung</th>
@@ -334,7 +198,7 @@ var DonationReceipt = React.createClass({
                                     <tr key={index}>
                                         <td>
                                             {
-                                                parseDate(row['DATUM']).toLocaleDateString('de-DE', {
+                                                parseGermanDate(row['DATUM']).toLocaleDateString('de-DE', {
                                                     year: 'numeric',
                                                     month: '2-digit',
                                                     day: '2-digit'
@@ -359,141 +223,13 @@ var DonationReceipt = React.createClass({
                         </tbody>
                     </table>
                 </div>
-                {/*this.generateAttachmentPagePlaceholder()*/}
             </div>
         );
     }
-});
+}
 
-var App = React.createClass({
-    getInitialState: function() {
-        return {
-            file: null,
-            csvRows: [],
-            openButton: <OpenButton onFileOpened={this.onFileOpened} />,
-            generateDonationReceiptsButton: <GenerateDonationReceiptsButton
-                onClick={this.onPrintPreviewClicked}
-                activeStateSetter={this.setActiveStateSetter}
-            />,
-            activeStateSetterFnc: null,
-            donationReceipts: []
-        };
-    },
+DonationReceipt.propTypes = {
+    donationRows: PropTypes.array.isRequired
+};
 
-    getOpenButton: function () {
-        return this.state.openButton;
-    },
-
-    getGenerateDonationReceiptsButton: function () {
-        return this.state.generateDonationReceiptsButton;
-    },
-
-    setActiveStateSetter: function (activeStateSetterFnc) {
-        this.state.activeStateSetterFnc = activeStateSetterFnc;
-    },
-
-    onFileOpened: function(file) {
-        var $this = this;
-
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            CSV.RELAXED = true;
-            CSV.COLUMN_SEPARATOR = ';';
-
-            var fileContent = e.target.result;
-            //var csvRows = CSV.parse(convertLatin1ToUtf8(fileContent));
-            var csvRows = CSV.parse(fileContent);
-            var headerRow = csvRows[0];
-
-            // convert rows to objects
-            for (var i = 0; i < csvRows.length; i++) {
-                var obj = {};
-                for (var j = 0; j < csvRows[i].length; j++) {
-                    var key = headerRow[j];
-                    obj[key] = csvRows[i][j];
-                }
-                csvRows[i] = obj;
-            }
-
-            $this.state.activeStateSetterFnc(true);
-            $this.setState({
-                file: file,
-                csvRows: csvRows,
-                donationReceipts: []
-            });
-        };
-        reader.readAsText(file, 'ISO-8859-1');
-    },
-
-    onPrintPreviewClicked: function() {
-        var groupedByDonator = {};
-
-        for (var i = 1; i < this.state.csvRows.length; i++) {
-            var row = this.state.csvRows[i];
-            var account = parseInt(row['KONTO']);
-            var donatorId = row['MITNUM'];
-            if (3221 === account || 3222 === account) {
-                if (groupedByDonator[donatorId]) {
-                    groupedByDonator[donatorId].push(row);
-                } else {
-                    groupedByDonator[donatorId] = [row];
-                }
-            }
-        }
-
-        // Konvert the object with the grouped donations to an array and sort it
-        // by the names of the donators.
-        var sortedByName = Object.values(groupedByDonator).sort(function (a, b) {
-            var aName = a[0]['NAME'] + ' ' + a[0]['VORNAME'];
-            var bName = b[0]['NAME'] + ' ' + b[0]['VORNAME'];
-
-            if (aName > bName) {
-                return 1;
-            } else if (aName < bName) {
-                return -1;
-            }
-            return 0;
-        });
-
-        var donationReceipts = [];
-
-        sortedByName.forEach(function (donationRows) {
-            var donatorId = donationRows[0]['MITNUM'];
-            donationReceipts.push(
-                <DonationReceipt key={donatorId} donationRows={donationRows} />
-            );
-        });
-
-        this.setState({donationReceipts: donationReceipts});
-    },
-
-    render: function() {
-        if (this.state.donationReceipts.length > 0) {
-            return (
-                <div>{this.state.donationReceipts}</div>
-            );
-        }
-        
-        if (this.state.file) {
-            return(
-                <div>
-                    <CsvTable csvRows={this.state.csvRows}></CsvTable>
-                </div>
-            );
-        }
-
-        return (
-            <div></div>
-        );
-    }
-});
-
-//var openButton = <OpenButton />;
-//console.log(openButton);
-//
-//ReactDOM.render(<OpenButton />, document.querySelector('#open-button'));
-
-var renderedApp = ReactDOM.render(<App />, document.querySelector('#donation-list'));
-
-ReactDOM.render(renderedApp.getOpenButton(), document.querySelector('#open-button'));
-ReactDOM.render(renderedApp.getGenerateDonationReceiptsButton(), document.querySelector('#generate-donation-receipts-button'));
+export default DonationReceipt;

@@ -26,39 +26,6 @@ td, th, .table > thead > tr > td, .table > thead > tr > th {
     font-size: 7.5pt;
 }
 
-.address-margin {
-    height: 0;
-}
-
-.first-page {
-    position: relative;
-}
-
-.logo {
-    height: 20mm;
-}
-
-.address {
-    box-sizing: border-box;
-    width: 90mm;
-/*    height: 45mm;*/
-    margin-top: 5mm; /* page margin is already 20mm => 45mm */
-    padding: 2mm 2mm 2mm 0;
-}
-
-.address .sender {
-    font-size: 7pt;
-    margin-bottom: 5mm;
-}
-
-.date {
-    margin-bottom: 7.5mm;
-}
-
-.signature {
-    padding: 20mm 0 5mm 0;
-}
-
 .footer tr td {
     box-sizing: border-box;
     width: 33.32%;
@@ -71,4 +38,7 @@ td, th, .table > thead > tr > td, .table > thead > tr > th {
 .footer tr td:last-child {
     border-left: 0.5pt solid #000;
     padding-right: 0;
+}
+.btn {
+    cursor: default;
 }

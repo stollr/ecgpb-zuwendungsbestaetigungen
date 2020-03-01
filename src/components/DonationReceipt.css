@@ -1,0 +1,84 @@
+@page {
+    size: A4 portrait; /* auto is the initial value */
+
+    /* this affects the margin in the printer settings */
+    margin: 20mm 20mm 10mm 20mm;
+}
+
+@media print {
+    .donation-receipt {
+        page-break-after: always;
+        width: 170mm;
+    }
+
+    .first-page {
+        page-break-after: always;
+    }
+
+    .attachment-page-placeholder {
+        page-break-after: always;
+    }
+
+    .footer {
+        position: absolute;
+        top: 250mm;
+    }
+}
+
+@media screen {
+    .donation-receipt > * {
+        box-sizing: border-box;
+        border: 1px solid #aaa;
+        width: 210mm;
+        padding: 20mm 20mm 10mm 20mm;
+        margin: 0 auto;
+    }
+
+    .first-page {
+        height: 297mm;
+    }
+
+    .footer {
+        position: absolute;
+        top: 270mm;
+    }
+}
+
+.address-margin {
+    height: 0;
+}
+
+.first-page {
+    position: relative;
+}
+
+.logo {
+    height: 20mm;
+}
+
+.address {
+    box-sizing: border-box;
+    width: 90mm;
+/*    height: 45mm;*/
+    margin-top: 5mm; /* page margin is already 20mm => 45mm */
+    padding: 2mm 2mm 2mm 0;
+}
+
+.address .sender {
+    font-size: 7pt;
+    margin-bottom: 5mm;
+}
+
+.date {
+    margin-bottom: 7.5mm;
+}
+
+.signature {
+    padding: 15mm 0 5mm 0;
+}
+.signature img {
+    position: absolute;
+    width: 6rem;
+    margin-left: 2.25rem;
+    margin-top: -2.5rem;
+}
