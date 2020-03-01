@@ -2,6 +2,7 @@
   "name": "ecgpb-zuwendungsbestaetigungen",
   "version": "2.0.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "CSV-JS": "^1.2.0",
     "bootstrap": "^4.4.1",
