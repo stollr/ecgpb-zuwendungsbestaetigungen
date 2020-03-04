@@ -11,11 +11,13 @@ class App extends React.Component {
 
         this.onFileOpened = this.onFileOpened.bind(this);
         this.onPrintPreviewClicked = this.onPrintPreviewClicked.bind(this);
+        this.onCopyStampToggle = this.onCopyStampToggle.bind(this);
 
         this.state = {
             file: null,
             csvRows: [],
-            donationReceipts: []
+            showCopyStamp: false,
+            groupedDonationRows: []
         };
     }
 
@@ -45,7 +47,7 @@ class App extends React.Component {
             $this.setState({
                 file: file,
                 csvRows: csvRows,
-                donationReceipts: []
+                groupedDonationRows: []
             });
         };
         reader.readAsText(file, 'ISO-8859-1');
@@ -69,7 +71,7 @@ class App extends React.Component {
 
         // Konvert the object with the grouped donations to an array and sort it
         // by the names of the donators.
-        var sortedByName = Object.values(groupedByDonator).sort(function (a, b) {
+        var groupedDonationRows = Object.values(groupedByDonator).sort(function (a, b) {
             var aName = a[0]['NAME'] + ' ' + a[0]['VORNAME'];
             var bName = b[0]['NAME'] + ' ' + b[0]['VORNAME'];
 
@@ -81,23 +83,38 @@ class App extends React.Component {
             return 0;
         });
 
-        var donationReceipts = [];
+        this.setState({groupedDonationRows: groupedDonationRows});
+    }
 
-        sortedByName.forEach(function (donationRows) {
-            var donatorId = donationRows[0]['MITNUM'];
-            donationReceipts.push(
-                <DonationReceipt key={donatorId} donationRows={donationRows} />
-            );
-        });
-
-        this.setState({donationReceipts: donationReceipts});
+    onCopyStampToggle() {
+        this.setState({showCopyStamp: !this.state.showCopyStamp});
     }
 
     render() {
+        const $this = this;
         var content;
 
-        if (this.state.donationReceipts.length > 0) {
-            content = this.state.donationReceipts;
+        if (this.state.groupedDonationRows.length > 0) {
+            content = (
+                <div>
+                    <div className="text-center mt-2">
+                        <label>
+                            <input type="checkbox"
+                                   value="1"
+                                   checked={this.state.showCopyStamp}
+                                   onChange={this.onCopyStampToggle} />
+                            Stempel "Kopie" aufdrucken
+                        </label>
+                    </div>
+                    {this.state.groupedDonationRows.map(function (donationRows) {
+                        return(
+                            <DonationReceipt
+                                key={donationRows[0]['MITNUM']}
+                                donationRows={donationRows}
+                                showCopyStamp={$this.state.showCopyStamp} />
+                        );
+                    })}
+                </div>);
         } else if (this.state.file) {
             content = (<CsvTable rows={this.state.csvRows}></CsvTable>);
         } else {

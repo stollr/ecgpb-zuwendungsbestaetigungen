@@ -2,6 +2,7 @@ import React from 'react';
 import T2W from 'numbers2words';
 import PropTypes from 'prop-types';
 import './DonationReceipt.css';
+import CopyStamp from './CopyStamp.js';
 import logoImg from '../img/logo.png';
 import signatureImg from '../img/signature.png';
 import { parseGermanDate } from './DateParser.js';
@@ -69,10 +70,11 @@ class DonationReceipt extends React.Component {
         return (
             <div className="donation-receipt">
                 <div className="first-page">
+                    <CopyStamp show={this.props.showCopyStamp} />
                     <div className="text-right">
                         <img className="logo" src={logoImg} alt="logo" />
                     </div>
-                    <comment c="this is needed in print view to get the correct margin of address"/>
+                    <div c="this is needed in print view to get the correct margin of address"/>
                     <div className="address-margin">&nbsp;</div>
                     <div className="address">
                         <div className="sender">
